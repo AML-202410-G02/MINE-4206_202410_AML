@@ -4,7 +4,6 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.back.ModelController import ModelController
-from src.model.Connection import FilesConnection
 
 ### Setup and configuration
 
@@ -21,30 +20,20 @@ default_text = "Capital markets regulator Sebi has notified rules allowing priva
 
 ### My UI starting here
 
-with st.expander("View the repo license with help from FilesConnection"):
+with st.expander("Seleccione el archivo con los datos de clasificación"):
     uploaded_file = st.file_uploader("Upload a file")
     if uploaded_file is not None:
         # Aquí puedes leer y mostrar el contenido del archivo
         license_content = uploaded_file.read()
         st.write(license_content)
-
-
-with st.form(key="my_form"):
-    text = st.text_area(
-        "Your text",
-        value=default_text,
-        height=200,
-        help="Please input your text, click on submit. We will provide you with the topic and accuracy",
-        key="1"
-    )
-
+    
     submit_button = st.form_submit_button(label="Submit")
 
     with st.spinner("Processing your text...."):
 
         if submit_button:
             try:
-                result_df = ctrl.predict(text)
+                result_df = ctrl.predict(license_content)
                 result_df['Ramp Bar'] = result_df['Probability'].apply(generate_progress_bar)
                 result_df['Probability'] = result_df['Probability'] * 100
 
@@ -54,15 +43,3 @@ with st.form(key="my_form"):
             except:
                 st.error("Something happened", icon="🚨")
 
-local = st.tabs(["Local"])
-
-with local:
-    "### Local Access"
-    with st.echo():
-        conn = st.experimental_connection("local", type=FilesConnection)
-        st.help(conn)
-
-    with st.echo():
-        with st.expander("View the repo license with help from FilesConnection"):
-            license = conn.read('../LICENSE', input_format='text')
-            license
