@@ -21,10 +21,13 @@ default_text = "Capital markets regulator Sebi has notified rules allowing priva
 
 ### My UI starting here
 
-with st.expander("Tip"):
-    f"""
-    Please input your text, click on submit. We will provide you with the topic and accuracy. 
-    """
+with st.expander("View the repo license with help from FilesConnection"):
+    uploaded_file = st.file_uploader("Upload a file")
+    if uploaded_file is not None:
+        # Aquí puedes leer y mostrar el contenido del archivo
+        license_content = uploaded_file.read()
+        st.write(license_content)
+
 
 with st.form(key="my_form"):
     text = st.text_area(
