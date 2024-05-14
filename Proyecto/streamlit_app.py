@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.back.ModelController import ModelController
+from src.model.Connection import FilesConnection
 
 ### Setup and configuration
 
@@ -50,3 +51,15 @@ with st.form(key="my_form"):
             except:
                 st.error("Something happened", icon="🚨")
 
+local = st.tabs(["Local"])
+
+with local:
+    "### Local Access"
+    with st.echo():
+        conn = st.experimental_connection("local", type=FilesConnection)
+        st.help(conn)
+
+    with st.echo():
+        with st.expander("View the repo license with help from FilesConnection"):
+            license = conn.read('../LICENSE', input_format='text')
+            license

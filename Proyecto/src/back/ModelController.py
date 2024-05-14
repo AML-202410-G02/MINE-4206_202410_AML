@@ -33,4 +33,4 @@ class ModelController:
         return df
 
     def get_categories(self):
-        return ["Entertainment", "Business", "Technology", "Sports", "Education"]
+        return ["Alto", "Medio", "Bajo"]
