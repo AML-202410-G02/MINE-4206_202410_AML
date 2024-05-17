@@ -3,12 +3,12 @@ import pandas as pd
 from sklearn.externals import joblib
 
 # Cargar el modelo
-model = joblib.load('modelo.joblib')
+#model = joblib.load('modelo.joblib')
 
 # Función para hacer predicciones
-def predict(data):
-    prediction = model.predict(data)
-    return prediction
+#def predict(data):
+#    prediction = model.predict(data)
+#    return prediction
 
 # UI
 st.title('Predicción con Modelo Guardado')
@@ -23,8 +23,8 @@ if uploaded_file is not None:
 
     # Realizar predicciones si hay datos cargados
     if st.button('Hacer predicciones'):
-        predictions = predict(data)
+        #predictions = predict(data)
         st.write("### Predicciones:")
-        st.write(predictions)
+        #st.write(predictions)
 
 
