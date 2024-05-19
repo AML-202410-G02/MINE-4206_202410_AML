@@ -1,15 +1,22 @@
+import Definitions
+import os.path as osp
 import pandas as pd
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 class DataPreprocessor:
     def __init__(self):
-        self.preprocessor = None
+        self.train_path = osp.join(Definitions.ROOT_DIR, "resources/data", "train.csv")
+        self.numeric_imputer = SimpleImputer(strategy='median')
+        self.numeric_scaler = StandardScaler()
+        self.categorical_imputer = SimpleImputer(strategy='most_frequent')
+        self.categorical_encoder = OneHotEncoder(handle_unknown='ignore')
 
-    def preprocess_data(self, df):
+    def preprocess_data(self, data):
+        df = data.copy()
         # Paso 1: Seleccionar características
+        df['Difference Bat %'] = df['Takeoff Bat %'] - df['Landing Bat %']
+
         selected_features = [
             'Pilot-in-Command', 'Above Sea Level (Meters)', 'Drone Type', 'Takeoff Bat %',
             'Takeoff mAh', 'Takeoff Volts', 'Max Altitude (Meters)', 'Total Mileage (Kilometers)',
@@ -30,40 +37,45 @@ class DataPreprocessor:
 
         return df
 
-    def create_preprocessor(self):
-        # Definir los pasos de preprocesamiento
+    def fit_numeric_transformers(self, df):
         numeric_features = [
             'Above Sea Level (Meters)', 'Takeoff Bat %', 'Takeoff mAh', 'Takeoff Volts',
             'Max Altitude (Meters)', 'Total Mileage (Kilometers)', 'Air Seconds'
         ]
+        self.numeric_imputer.fit(df[numeric_features])
+        self.numeric_scaler.fit(df[numeric_features])
+
+    def transform_numeric(self, data):
+        df = data.copy()
+        numeric_features = [
+            'Above Sea Level (Meters)', 'Takeoff Bat %', 'Takeoff mAh', 'Takeoff Volts',
+            'Max Altitude (Meters)', 'Total Mileage (Kilometers)', 'Air Seconds'
+        ]
+        df[numeric_features] = self.numeric_imputer.transform(df[numeric_features])
+        df[numeric_features] = self.numeric_scaler.transform(df[numeric_features])
+        return df
+
+    def fit_categorical_transformers(self, df):
         categorical_features = ['Pilot-in-Command', 'Drone Type']
+        self.categorical_imputer.fit(df[categorical_features])
+        df_imputed = self.categorical_imputer.transform(df[categorical_features])
+        self.categorical_encoder.fit(df_imputed)
 
-        # Preprocesamiento para características numéricas
-        numeric_transformer = Pipeline(steps=[
-            ('imputer', SimpleImputer(strategy='median')),
-            ('scaler', StandardScaler())
-        ])
+    def transform_categorical(self, df):
+        categorical_features = ['Pilot-in-Command', 'Drone Type']
+        df[categorical_features] = self.categorical_imputer.transform(df[categorical_features])
+        encoded_cats = self.categorical_encoder.transform(df[categorical_features]).toarray()
+        df = df.drop(columns=categorical_features)
+        df = pd.concat([df, pd.DataFrame(encoded_cats, columns=self.categorical_encoder.get_feature_names_out(categorical_features))], axis=1)
+        return df
 
-        # Preprocesamiento para características categóricas
-        categorical_transformer = Pipeline(steps=[
-            ('imputer', SimpleImputer(strategy='most_frequent')),
-            ('onehot', OneHotEncoder(handle_unknown='ignore'))
-        ])
+    def transform(self, df):
+        df = self.preprocess_data(df)
+        df_train = pd.read_csv(self.train_path)
+        self.fit_numeric_transformers(df_train)
+        self.fit_categorical_transformers(df_train)
+        df = self.transform_numeric(df)
+        df = self.transform_categorical(df)
+        return df
 
-        # Combinación de preprocesamientos
-        self.preprocessor = ColumnTransformer(
-            transformers=[
-                ('num', numeric_transformer, numeric_features),
-                ('cat', categorical_transformer, categorical_features)
-            ]
-        )
 
-    def fit_transform(self, X):
-        if self.preprocessor is None:
-            self.create_preprocessor()
-        return self.preprocessor.fit_transform(X)
-
-    def transform(self, X):
-        if self.preprocessor is None:
-            self.create_preprocessor()
-        return self.preprocessor.transform(X)
