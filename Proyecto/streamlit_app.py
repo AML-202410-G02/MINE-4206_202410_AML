@@ -27,12 +27,14 @@ if uploaded_file is not None:
     # Realizar predicciones si hay datos cargados
     if st.button('Hacer predicciones'):
         try:
-            result_df = ctrl.predict(df)
-            result_df['Probability'] = result_df['Probability'] * 100
+            predictions = ctrl.predict(df)
+            df['Predicción'] = predictions
+            st.subheader('Predicción')
+            st.write(df)
 
             st.success("✅ Done!")
 
-            st.markdown(result_df.to_html(escape=False), unsafe_allow_html=True)
+            #st.markdown(result_df.to_html(escape=False), unsafe_allow_html=True)
         except:
             st.error("Something happened", icon="🚨")
 
