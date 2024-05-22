@@ -10,7 +10,7 @@ from src.model.DataPreprocessor import DataPreprocessor
 class ModelController:
 
     def __init__(self):
-        self.model_path = osp.join(Definitions.ROOT_DIR, "resources\models", "model.joblib")
+        self.model_path = "resources\models\model.joblib"
         self.model = load(self.model_path)
 
         self.preprocessor = DataPreprocessor()
