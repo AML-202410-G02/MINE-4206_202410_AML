@@ -3,8 +3,7 @@ import os.path as osp
 
 class DataPreprocessor:
     def __init__(self):
-        self.train_path = osp.join(Definitions.ROOT_DIR, "resources/data", "train.csv")
-
+        return 
     def preprocess_data(self, data):
         df = data.copy()
         # Paso 1: Seleccionar características
