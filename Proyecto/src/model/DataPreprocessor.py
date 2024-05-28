@@ -11,8 +11,7 @@ class DataPreprocessor:
 
         selected_features = [
             'Pilot-in-Command', 'Above Sea Level (Meters)', 'Drone Type', 'Takeoff Bat %',
-            'Takeoff Volts', 'Max Altitude (Meters)', 'Total Mileage (Kilometers)',
-            'Air Seconds', 'Difference Bat %'
+            'Takeoff Volts', 'Max Altitude (Meters)', 'Total Mileage (Kilometers)', 'Difference Bat %'
         ]
         df = df[selected_features]
         # Paso 2: Crear la nueva columna 'Battery Consumption'
@@ -21,7 +20,7 @@ class DataPreprocessor:
         # Paso 3: Seleccionar características finales para el modelo
         final_features = [
             'Pilot-in-Command', 'Above Sea Level (Meters)', 'Drone Type', 'Takeoff Bat %', 'Takeoff Volts', 
-            'Max Altitude (Meters)', 'Total Mileage (Kilometers)','Air Seconds', 'Battery Consumption'
+            'Max Altitude (Meters)', 'Total Mileage (Kilometers)', 'Battery Consumption'
         ]
         df = df[final_features]
 

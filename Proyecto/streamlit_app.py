@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 from src.back.ModelController import ModelController
 
@@ -28,14 +29,22 @@ if uploaded_file is not None:
     if st.button('Hacer predicciones'):
         try:
             predictions = ctrl.predict(df)
-            df['Predicción'] = predictions
+            
+            # Convertir las predicciones a una serie de Pandas
+            predictions_series = pd.Series(predictions, name='Predicción')
+            
+            # Mapear las predicciones numéricas a etiquetas de texto
+            pred_map = {1: 'Bajo', 2: 'Medio', 3: 'Alto'}
+            predictions_series = predictions_series.map(pred_map)
+            
+            # Agregar las predicciones al DataFrame original
+            df['Predicción'] = predictions_series
+            
             st.subheader('Predicción')
             st.write(df)
 
             st.success("✅ Done!")
 
             #st.markdown(result_df.to_html(escape=False), unsafe_allow_html=True)
-        except:
-            st.error("Something happened", icon="🚨")
-
-
+        except Exception as e:
+            st.error(f"Something happened: {e}", icon="🚨")
